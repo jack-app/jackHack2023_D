@@ -13,10 +13,10 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
-        const socket = io()
+        const socket = io() // ここでコネクションができる
         socket.on("result", data => {
             alert(data)
-            // console.log(data)
+            console.log(data)
         })
     </script>
 </body>
