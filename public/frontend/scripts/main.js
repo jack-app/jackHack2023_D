@@ -6,7 +6,8 @@ const config = {
     type: Phaser.AUTO,
     height: 600,
     width: 800,
-    scene: scenes
+    scene: scenes,
+    backgroundColor: '#4488aa' // TODO: 要検討
 }
 
 
