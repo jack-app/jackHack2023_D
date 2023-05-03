@@ -15,6 +15,10 @@ app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/index.html");
 });
 
+app.get("/result", (req, res) => {
+  res.sendFile(DOCUMENT_ROOT + "/result.html");
+});
+
 //-----------------------------------------------
 // Socket.io
 //-----------------------------------------------
@@ -32,6 +36,10 @@ io.on("connection", (socket) => {
     // 本人にトークンを送付
     io.to(socket.id).emit("token", { token: token });
   })();
+  socket.emit("result", {
+    win: "月が綺麗ですね",
+    lose: ["ほげほげ", "ふがふが"],
+  });
 
   /**
    * [イベント] 入室する
@@ -63,6 +71,10 @@ io.on("connection", (socket) => {
       io.to(socket.id).emit("join-result", { status: false });
     }
   });
+
+  /**
+   * [イベント] 結果送信する
+   */
 });
 
 http.listen(3000, () => {
