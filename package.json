@@ -1,0 +1,12 @@
+{
+  "name": "jackhack2023teamd",
+  "version": "0.0.1",
+  "description": "JackHack2023 TeamD",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^1.7.3"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
