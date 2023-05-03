@@ -13,11 +13,11 @@ const SECRET_TOKEN = "abcdefghijklmn12345";
 const ROOMS = { 0: { participants: [], responded: 0, sentences: [] } };
 
 app.get("/", (req, res) => {
-  res.sendFile(DOCUMENT_ROOT + "frontend/index.html");
+  res.sendFile(DOCUMENT_ROOT + "/frontend/index.html");
 });
 
 app.get("/play", (req, res) => {
-  res.sendFile(DOCUMENT_ROOT + "/play.html");
+  res.sendFile(DOCUMENT_ROOT + "/frontend/play.html");
 });
 
 app.get("/result", (req, res) => {
