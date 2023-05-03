@@ -1,44 +1,9 @@
 
-
-// export default class Card {
-//     constructor(scene, sprite) {
-//         this.scene = scene
-//         this.sprite = sprite
-//         this.posX = 0
-//         this.posY = 0
-//     }
-
-//     setPosition(x, y) {
-//         this.posX = x
-//         this.posY = y
-//     }
-
-//     draw(x, y, draggable=true) {
-//         this.setPosition(x, y)
-//         this.image = this.scene.add.image(this.posX, this.posY, this.sprite)
-//             .setScale(0.3, 0.3)
-//             .setInteractive()
-//         if (draggable) {
-//             this.image.drag = this.scene.plugins.get("rexdragplugin").add(this.image)
-//             this.image.drag.drag()
-//             this.image.on("dragend", (pointer) => {
-//                 // drag終了時の処理をかける（書かなくてもよさそう）
-//                 console.log("dragend")
-//                 console.log(pointer)
-//                 // this.image.destroy()
-//             }, this.image)
-//         }
-//     }
-
-// }
-
-
-
-
-// カードクラスを定義
+// 並び変える対象のカード
 export default class Card extends Phaser.GameObjects.Container {
-    constructor(scene, x, y, text) {
-      super(scene, x, y);
+    constructor(scene, text) {
+      super(scene, 0, 0);
+      this.setPosition(0, 0)
 
       // card frame
       this.card = scene.add.rectangle(0, 0, 100, 150, 0xffffff);
@@ -50,21 +15,38 @@ export default class Card extends Phaser.GameObjects.Container {
       this.add(this.text);
 
       // enable dnd
-      this.setSize(100,100)
+      this.setSize(100,100) // この辺でスケールとかサイズとか調整
       this.setInteractive()
-      scene.input.setDraggable(this);
-      scene.input.on('dragstart', (pointer, gameObject) => {
-        console.log("drag start")
-        scene.children.bringToTop(gameObject);
-      });
-      scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
-        console.log("drag")
-        gameObject.x = dragX;
-        gameObject.y = dragY;
-      });
-      scene.input.on("dragend", (pointer, gameObject) => {
-        console.log("drag end")
-      })
+      this.scene.input.setDraggable(this);
+      this.scene.input.on('dragstart', this.dragStart);
+      this.scene.input.on('drag', this.drag);
+      this.scene.input.on("dragend", this.dragEnd)
+    }
+
+
+    dragStart(pointer, gameObject) {
+      console.log("==== Drag Start ====")
+      // console.log(pointer)
+      // console.log(gameObject)
+      this.scene.children.bringToTop(gameObject);
+      console.log("=====================")
+    }
+
+
+    drag(pointer, gameObject, dragX, dragY) {
+      console.log("==== Drag ====")
+      // console.log(pointer)
+      // console.log(gameObject)
+      // console.log(dragX)
+      // console.log(dragY)
+      gameObject.x = dragX;
+      gameObject.y = dragY;
+      console.log("==============")
+    }
+
+    dragEnd(pointer, gameObject) {
+      console.log("==== Drag End ====")
+      console.log("==================")
     }
   }
 
