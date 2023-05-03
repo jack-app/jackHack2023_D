@@ -1,20 +1,22 @@
 const crypto = require("crypto");
-const express = require("express")
-const app = express();
+const app = require("express")();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 
 const DOCUMENT_ROOT = __dirname + "/public";
-app.use(express.static("public"));
 
 // トークンを作成する際の秘密鍵
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
 // 部屋一覧
-const ROOMS = { 0: { participants: [] } };
+const ROOMS = { 0: { participants: [], responded: 0, sentences: [] } };
 
 app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/index.html");
+});
+
+app.get("/play", (req, res) => {
+  res.sendFile(DOCUMENT_ROOT + "/play.html");
 });
 
 app.get("/result", (req, res) => {
@@ -52,18 +54,14 @@ io.on("connection", (socket) => {
     // トークンが正しければ
     //--------------------------
     if (authToken(socket.id, data.token)) {
-      // 入室OK + 現在の入室者一覧を通知
-      ROOMS[0].participants.push(data.name);
+      // 入室OK + 現在の入室者数を通知
+      ROOMS[0].participants.push({ id: socket.id, name: data.name });
       io.to(socket.id).emit("join-result", {
         status: true,
-        list: ROOMS[0].participants,
       });
 
-      // 入室通知
-      io.to(socket.id).emit("member-join", data);
-      socket.broadcast.emit("member-join", {
-        name: data.name,
-        token: ROOMS[0].participants.count,
+      socket.emit("member-join", {
+        count: ROOMS[0].participants.length,
       });
     }
     //--------------------------
@@ -76,8 +74,79 @@ io.on("connection", (socket) => {
   });
 
   /**
-   * [イベント] 結果送信する
+   * [イベント] ゲームを開始する
    */
+  socket.on("start", (data) => {
+    //--------------------------
+    // トークンが正しければ
+    //--------------------------
+    if (authToken(socket.id, data.token)) {
+      // 本人にOK通知
+      io.to(socket.id).emit("start-result", { status: true });
+      socket.broadcast.emit("start-game", {});
+    }
+    //--------------------------
+    // トークンが誤っていた場合
+    //--------------------------
+    else {
+      // 本人にNG通知
+      io.to(socket.id).emit("start-result", { status: false });
+    }
+  });
+
+  socket.on("submit", (data) => {
+    //--------------------------
+    // トークンが正しければ
+    //--------------------------
+    if (authToken(socket.id, data.token)) {
+      // 本人にOK通知
+      io.to(socket.id).emit("submit-result", { status: true });
+      ROOMS[0].sentences.push(data.sentence);
+    }
+    //--------------------------
+    // トークンが誤っていた場合
+    //--------------------------
+    else {
+      // 本人にNG通知
+      io.to(socket.id).emit("submit-result", { status: false });
+    }
+  });
+
+  socket.on("judge", (data) => {
+    //--------------------------
+    // トークンが正しければ
+    //--------------------------
+    if (authToken(socket.id, data.token)) {
+      // 本人にOK通知
+      io.to(socket.id).emit("judge-result", { status: true });
+      socket.emit("judge-list", { list: ROOMS[0].sentences });
+    }
+    //--------------------------
+    // トークンが誤っていた場合
+    //--------------------------
+    else {
+      // 本人にNG通知
+      io.to(socket.id).emit("judge-result", { status: false });
+    }
+  });
+
+  socket.on("result", (data) => {
+    //--------------------------
+    // トークンが正しければ
+    //--------------------------
+    if (authToken(socket.id, data.token)) {
+      // 本人にOK通知
+      io.to(socket.id).emit("result-result", { status: true });
+      socket.emit("result-sentences", { list: data.sentence });
+    }
+    //--------------------------
+    // トークンが誤っていた場合
+    //--------------------------
+    else {
+      // 本人にNG通知
+      io.to(socket.id).emit("result-result", { status: false });
+    }
+  });
 });
 
 http.listen(3000, () => {
