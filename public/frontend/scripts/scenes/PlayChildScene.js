@@ -1,7 +1,7 @@
 
-export class PlayScene extends Phaser.Scene {
+export class PlayChildScene extends Phaser.Scene {
     constructor() {
-        super({ key: "PlayScene" })
+        super({ key: "PlayChildScene" })
     }
 
 
@@ -22,16 +22,12 @@ export class PlayScene extends Phaser.Scene {
         // Can be defined on your own Scenes. Use it to create your game objects.
         // This method is called by the Scene Manager when the scene starts, after init() and preload().
         // If the LoaderPlugin started after preload(), then this method is called only after loading is complete.
-        const sceneName = this.add.text(150, 70, 'PlayScene').setFontSize(30).setFontFamily("Arial").setOrigin(0.5).setInteractive();
+        const sceneName = this.add.text(150, 70, 'PlayChildScene').setFontSize(30).setFontFamily("Arial").setOrigin(0.5).setInteractive();
 
-	    const change_to_child = this.add.text(150, 130, 'To child scene').setFontSize(20).setFontFamily("Arial").setOrigin(0.5).setInteractive();
-	    const change_to_parent = this.add.text(150, 190, 'To parent scene').setFontSize(20).setFontFamily("Arial").setOrigin(0.5).setInteractive();
+	    const change = this.add.text(150, 130, 'To Result Scene').setFontSize(20).setFontFamily("Arial").setOrigin(0.5).setInteractive();
 
-        change_to_child.on('pointerdown', function (pointer) {
-            this.scene.start('PlayChildScene');
-        }, this);
-        change_to_parent.on('pointerdown', function (pointer) {
-            this.scene.start('PlayParentScene');
+        change.on('pointerdown', function (pointer) {
+            this.scene.start('ResultScene');
         }, this);
     }
 

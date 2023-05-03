@@ -1,7 +1,4 @@
-import { StartScene } from "./scenes/StartScene.js"
-import { PlayScene } from "./scenes/PlayScene.js"
-import { ResultScene } from "./scenes/ResultScene.js"
-
+import { scenes } from "./scenes/scenes.js"
 
 
 const config = {
@@ -9,7 +6,7 @@ const config = {
     type: Phaser.AUTO,
     height: 600,
     width: 800,
-    scene: [StartScene, PlayScene, ResultScene]
+    scene: scenes
 }
 
 
