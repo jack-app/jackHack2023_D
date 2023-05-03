@@ -45,7 +45,7 @@ export class PlayParentScene extends Phaser.Scene {
         this.background.displayHeight = this.sys.canvas.height;
 
 
-        // this.input.addPointer(3)
+        this.input.addPointer(3)
         // this.input.on("pointerdown", (pointer) => {
         //     const img = this.add.image(pointer.x, pointer.y, 'arrow');
         //     img.drag = this.plugins.get('rexdragplugin').add(img);
@@ -56,13 +56,17 @@ export class PlayParentScene extends Phaser.Scene {
 
 
         this.cards = [
-            new Card(this, "arrow"),
-            new Card(this, "arrow"),
-            new Card(this, "arrow")
+            new Card(this, 100, 100, "this"),
+            new Card(this, 100, 200, "is"),
+            new Card(this, 100, 300, "sample"),
+            new Card(this, 100, 400, "text")
         ]
 
-        this.cards.forEach((c, i) => {
-            c.draw(this.paddingX, this.paddingY + i * 40)
+        // console.log(this.input)
+        // console.log(this.cards)
+        // this.input.setDraggable(this.cards[0])
+        this.cards.forEach(card => {
+            this.add.existing(card)
         })
 
 
