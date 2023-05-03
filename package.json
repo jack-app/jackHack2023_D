@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "JackHack2023 TeamD",
   "dependencies": {
+    "crypto": "^1.0.1",
     "express": "^4.17.1",
     "socket.io": "^1.7.3"
   },
