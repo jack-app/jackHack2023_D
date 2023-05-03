@@ -11,7 +11,7 @@ app.use(express.static("public"));
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
 // 部屋一覧
-const ROOMS = {};
+const ROOMS = { 0: { participants: [] } };
 
 app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/index.html");
@@ -38,6 +38,7 @@ io.on("connection", (socket) => {
     // 本人にトークンを送付
     io.to(socket.id).emit("token", { token: token });
   })();
+
   socket.emit("result", {
     win: "月が綺麗ですね",
     lose: ["ほげほげ", "ふがふが"],
@@ -50,19 +51,19 @@ io.on("connection", (socket) => {
     //--------------------------
     // トークンが正しければ
     //--------------------------
-    if (authToken(socket.id, data.token) && data.room_id in ROOMS) {
+    if (authToken(socket.id, data.token)) {
       // 入室OK + 現在の入室者一覧を通知
-      ROOMS[data.room_id].participants.push(data.name);
+      ROOMS[0].participants.push(data.name);
       io.to(socket.id).emit("join-result", {
         status: true,
-        list: ROOMS[data.room_id].participants,
+        list: ROOMS[0].participants,
       });
 
       // 入室通知
       io.to(socket.id).emit("member-join", data);
       socket.broadcast.emit("member-join", {
         name: data.name,
-        token: ROOMS[socket.id].participants.count,
+        token: ROOMS[0].participants.count,
       });
     }
     //--------------------------
