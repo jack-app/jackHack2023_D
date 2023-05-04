@@ -9,6 +9,24 @@ app.use(express.static("public"));
 // トークンを作成する際の秘密鍵
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
+const verb = []; //動詞
+const subject = [
+  "僕",
+  "僕が",
+  "僕に",
+  "僕の",
+  "僕と",
+  "君",
+  "君が",
+  "君に",
+  "君の",
+  "君と",
+]; //主語
+const particle = ["て", "に", "を", "は", "が"]; //助詞
+const adjective = []; //形容詞,形容動詞
+const adverb = []; //副詞
+const noun = []; //名詞
+
 // 部屋一覧
 const ROOMS = {
   0: {
