@@ -125,8 +125,7 @@ io.on("connection", (socket) => {
     // トークンが正しければ
     //--------------------------
     if (authToken(socket.id, data.token)) {
-      console.log(data.word);
-      ROOMS[0].original_words.push(data.word);
+      ROOMS[0].original_words.push(data.submit_word);
       if (
         ROOMS[0].original_words.length ==
         Object.keys(ROOMS[0].participants).length

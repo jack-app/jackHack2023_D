@@ -138,9 +138,15 @@ export class PlayChildScene extends Phaser.Scene {
 
   #clear() {
     //  console.log("-----selected-----");
-    this.selected_cards.forEach((card) => card.destroy());
+    this.selected_cards.forEach((card) => {
+      console.log(card.rawText);
+      card.destroy();
+    });
     //  console.log("-----unselected-----");
-    this.unselected_cards.forEach((card) => card.destroy());
+    this.unselected_cards.forEach((card) => {
+      console.log(card.rawText);
+      card.destroy();
+    });
     this.unselectedField.destroy();
     this.selectedField.destroy();
     this.reset.destroy();
@@ -167,7 +173,7 @@ export class PlayChildScene extends Phaser.Scene {
     );
     // console.log(index)
     if (index) {
-      this.unselected_cards.splice(index - 1, 1);
+      this.unselected_cards.splice(index, 1);
       this.selected_cards.push(card);
       //   console.log("==================");
       //   console.log(this.selected_cards);
