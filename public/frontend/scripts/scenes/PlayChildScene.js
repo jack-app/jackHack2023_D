@@ -137,16 +137,10 @@ export class PlayChildScene extends Phaser.Scene {
   }
 
   #clear() {
-    //  console.log("-----selected-----");
-    this.selected_cards.forEach((card) => {
-      console.log(card.rawText);
-      card.destroy();
-    });
     //  console.log("-----unselected-----");
-    this.unselected_cards.forEach((card) => {
-      console.log(card.rawText);
-      card.destroy();
-    });
+    this.unselected_cards.forEach((card) => card.destroy());
+    //  console.log("-----selected-----");
+    this.selected_cards.forEach((card) => card.destroy());
     this.unselectedField.destroy();
     this.selectedField.destroy();
     this.reset.destroy();
@@ -169,9 +163,9 @@ export class PlayChildScene extends Phaser.Scene {
   // used in card class
   toSelectedField(card) {
     const index = this.unselected_cards.findIndex(
-      (c) => c.text == card.rawText
+      (c) => c.rawText == card.rawText
     );
-    // console.log(index)
+    console.log(index)
     if (index) {
       this.unselected_cards.splice(index, 1);
       this.selected_cards.push(card);
@@ -186,7 +180,7 @@ export class PlayChildScene extends Phaser.Scene {
 
   toUnselectedField(card) {
     const index = this.unselected_cards.findIndex(
-      (c) => c.text == card.rawText
+      (c) => c.rawText == card.rawText
     );
     // console.log(index)
     if (index) {
