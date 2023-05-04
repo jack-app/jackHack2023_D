@@ -21,6 +21,21 @@ export class PlayScene extends Phaser.Scene {
     // If the LoaderPlugin started after preload(), then this method is called only after loading is complete.
 
     let player_count = null;
+    let explanation = null;
+
+    const sceneName = this.add
+      .text(150, 70, "PlayScene")
+      .setFontSize(30)
+      .setFontFamily("Arial")
+      .setOrigin(0.5)
+      .setInteractive();
+
+    const start_game = this.add
+      .text(150, 190, "Game Start!")
+      .setFontSize(20)
+      .setFontFamily("Arial")
+      .setOrigin(0.5)
+      .setInteractive();
 
     socket.emit("join", { token: socket.token, name: "hoge" });
 
@@ -47,37 +62,28 @@ export class PlayScene extends Phaser.Scene {
       }
     });
 
-    const sceneName = this.add
-      .text(150, 70, "PlayScene")
-      .setFontSize(30)
-      .setFontFamily("Arial")
-      .setOrigin(0.5)
-      .setInteractive();
-
-    const change_to_child = this.add
-      .text(150, 190, "To child scene")
-      .setFontSize(20)
-      .setFontFamily("Arial")
-      .setOrigin(0.5)
-      .setInteractive();
-    const change_to_parent = this.add
-      .text(150, 220, "To parent scene")
-      .setFontSize(20)
-      .setFontFamily("Arial")
-      .setOrigin(0.5)
-      .setInteractive();
-
-    change_to_child.on(
-      "pointerdown",
-      function (pointer) {
-        this.scene.start("PlayChildScene");
-      },
-      this
-    );
-    change_to_parent.on(
-      "pointerdown",
-      function (pointer) {
+    socket.on("start", (data) => {
+      if (data.parent == socket.id) {
         this.scene.start("PlayParentScene");
+      } else {
+        this.scene.start("PlayChildScene");
+      }
+    });
+
+    socket.on("create-word", (data) => {
+      player_count.destroy();
+      start_game.destroy();
+      explanation = this.add.text(150, 130, "オリジナルの単語を入力しよう", {
+        fontSize: 30,
+        fontFamily: "Arial",
+        origin: 0.5,
+      });
+    });
+
+    start_game.on(
+      "pointerdown",
+      function (pointer) {
+        socket.emit("create-words", { token: socket.token });
       },
       this
     );

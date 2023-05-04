@@ -10,7 +10,9 @@ app.use(express.static("public"));
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
 // 部屋一覧
-const ROOMS = { 0: { participants: {}, responded: 0, sentences: [] } };
+const ROOMS = {
+  0: { participants: {}, parent: null, sentences: [], original_words: [] },
+};
 
 app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/frontend/index.html");
@@ -70,24 +72,46 @@ io.on("connection", (socket) => {
     }
   });
 
-  /**
-   * [イベント] ゲームを開始する
-   */
-  socket.on("start", (data) => {
+  socket.on("create-words", (data) => {
     //--------------------------
     // トークンが正しければ
     //--------------------------
     if (authToken(socket.id, data.token)) {
-      // 本人にOK通知
-      io.to(socket.id).emit("start-result", { status: true });
-      socket.broadcast.emit("start-game", {});
+      io.emit("create-word", {});
     }
     //--------------------------
     // トークンが誤っていた場合
     //--------------------------
     else {
       // 本人にNG通知
-      io.to(socket.id).emit("start-result", { status: false });
+      io.to(socket.id).emit("start-game-result", { status: false });
+    }
+  });
+
+  socket.on("word", (data) => {
+    //--------------------------
+    // トークンが正しければ
+    //--------------------------
+    if (authToken(socket.id, data.token)) {
+      ROOMS[0].original_words.push(data.word);
+      if (
+        ROOMS[0].original_words.length ==
+        Object.keys(ROOMS[0].participants).length
+      ) {
+        io.emit("", { words: ROOMS[0].original_words });
+        let parent_index = Math.floor(
+          Math.random() * Object.keys(ROOMS[0].participants).length
+        );
+        ROOMS[0].parent = Object.keys(ROOMS[0].participants)[parent_index];
+        io.emit("start", { parent: ROOMS[0].parent });
+      }
+    }
+    //--------------------------
+    // トークンが誤っていた場合
+    //--------------------------
+    else {
+      // 本人にNG通知
+      io.to(socket.id).emit("start-game-result", { status: false });
     }
   });
 
