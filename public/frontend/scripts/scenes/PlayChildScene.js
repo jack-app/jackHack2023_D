@@ -74,7 +74,6 @@ export class PlayChildScene extends Phaser.Scene {
         this.unselected_cards.push(...this.selected_cards)
         this.selected_cards = []
         this.unselected_cards.forEach((card, i) => {
-            console.log(card.index)
             card.setPosition(this.sys.canvas.width/2 - this.fieldWidth/2 + 100 * card.index + 50 + 10 * card.index + 10, this.sys.canvas.height * 0.7)
         })
     }
@@ -93,7 +92,6 @@ export class PlayChildScene extends Phaser.Scene {
         if (index) {
             this.unselected_cards.splice(index, 1)
             this.selected_cards.push(card)
-            console.log(this.unselected_cards)
             // console.log("==================")
             // console.log(this.selected_cards)
             // console.log(this.unselected_cards)
