@@ -1,4 +1,4 @@
-import { socket } from "../main.js";
+import { socket, setSocket } from "../main.js";
 
 export class PlayScene extends Phaser.Scene {
   constructor() {
@@ -25,6 +25,7 @@ export class PlayScene extends Phaser.Scene {
     // Can be defined on your own Scenes. Use it to create your game objects.
     // This method is called by the Scene Manager when the scene starts, after init() and preload().
     // If the LoaderPlugin started after preload(), then this method is called only after loading is complete.
+    setSocket(io());
 
     let player_count = null;
     let explanation = null;
@@ -119,6 +120,7 @@ export class PlayScene extends Phaser.Scene {
           sceneName.destroy();
           explanation.destroy();
           please_text.destroy();
+          editor.destroy();
           submit.destroy();
           let wait_explanation = this.add.text(150, 130, "他の人の行動を待っています...", {
             fontSize: 30,
