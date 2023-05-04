@@ -57,7 +57,7 @@ io.on("connection", (socket) => {
         status: true,
       });
 
-      socket.emit("member-join", {
+      io.emit("member-join", {
         count: Object.keys(ROOMS[0].participants).length,
       });
     }
@@ -143,6 +143,17 @@ io.on("connection", (socket) => {
       // 本人にNG通知
       io.to(socket.id).emit("result-result", { status: false });
     }
+  });
+  /**
+   * [イベント] 退室する
+   */
+  socket.on("disconnect", () => {
+    io.emit("member-quit", {
+      count: Object.keys(ROOMS[0].participants).length - 1,
+      perticipant: ROOMS[0].participants[socket.id],
+    });
+    // 削除
+    delete ROOMS[0].participants[socket.id];
   });
 });
 
