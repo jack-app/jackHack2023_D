@@ -6,6 +6,7 @@
     "crypto": "^1.0.1",
     "express": "^4.17.1",
     "phaser": "^3.60.0",
+    "phaser3-rex-plugins": "^1.60.1",
     "socket.io": "^4.6.1"
   },
   "scripts": {
