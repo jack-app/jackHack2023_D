@@ -7,20 +7,20 @@ export class PlayChildScene extends Phaser.Scene {
 
 
     init() {
-        // Can be defined on your own Scenes.
-        // This method is called by the Scene Manager when the scene starts, before preload() and create().
 
         // definition of padding X and Y
-        this.paddingX = this.sys.canvas.width * 0.1
-        this.paddingY = this.sys.canvas.height * 0.1
+        const padding_x_ratio = 0.15
+        const padding_y_ratio = 0.2
+        this.paddingX = this.sys.canvas.width * padding_x_ratio
+        this.paddingY = this.sys.canvas.height * padding_y_ratio
+        this.fieldWidth = this.sys.canvas.width-this.paddingX*2
+
+        this.selected_cards = []
+        this.unselected_cards = []
     }
 
 
     preload() {
-        // Can be defined on your own Scenes. Use it to load assets.
-        // This method is called by the Scene Manager, after init() and before create(), only if the Scene has a LoaderPlugin.
-        // After this method completes, if the LoaderPlugin's queue isn't empty, the LoaderPlugin will start automatically
-
         // load image
         this.load.image("background", "frontend/81643.png")
 
@@ -37,38 +37,84 @@ export class PlayChildScene extends Phaser.Scene {
 
 
     create() {
-        // Can be defined on your own Scenes. Use it to create your game objects.
-        // This method is called by the Scene Manager when the scene starts, after init() and preload().
-        // If the LoaderPlugin started after preload(), then this method is called only after loading is complete.
-
-
         // Set background image
         this.background = this.add.image(this.sys.canvas.width/2, this.sys.canvas.height/2, "background").setOrigin(.5, .5)
         this.background.displayWidth = this.sys.canvas.width;
         this.background.displayHeight = this.sys.canvas.height;
 
+
+        this.selectedField = this.add.rectangle(this.sys.canvas.width/2, this.sys.canvas.height * 0.3, this.fieldWidth, 120, 0xffffff, 0.5).setOrigin(0.5, 0.5) // 左上の座標基準
+        this.unselectedField = this.add.rectangle(this.sys.canvas.width/2, this.sys.canvas.height * 0.7, this.fieldWidth, 120, 0xffffff, 0.5).setOrigin(0.5, 0.5) // 左上の座標基準
+
         // これなに？？？
         this.input.addPointer(3)
 
         // words から Cardを作成＆表示
-        this.cards = this.sample_wards.map(s => new Card(this, s))
-        this.cards.forEach((card, i) => {
-            card.setPosition(100, 100 + 100 * i)
+        this.unselected_cards = this.sample_wards.map((s, index) => new Card(this, s, index))
+        this.unselected_cards.forEach((card, i) => {
+            card.setPosition(this.sys.canvas.width/2 - this.fieldWidth/2 + 100 * i + 50 + 10 * i + 10, this.sys.canvas.height * 0.7)
             this.add.existing(card)
         })
 
 
-        const sceneName = this.add.text(150, 70, 'PlayChildScene').setFontSize(30).setFontFamily("Arial").setOrigin(0.5).setInteractive();
+        const reset = this.add.text(this.sys.canvas.width/2 - 30, this.sys.canvas.height/2, "reset").setFontSize(20).setFontFamily("Arial").setOrigin(0.5, 0.5).setInteractive();
+        reset.on("pointerdown", this.#reset, this)
 
-	    const change = this.add.text(150, 130, 'To Result Scene').setFontSize(20).setFontFamily("Arial").setOrigin(0.5).setInteractive();
-
-        change.on('pointerdown', function (pointer) {
-            this.scene.start('ResultScene');
-        }, this);
+	    const submit = this.add.text(this.sys.canvas.width/2 + 30, this.sys.canvas.height/2, "submit").setFontSize(20).setFontFamily("Arial").setOrigin(0.5, 0.5).setInteractive();
+        submit.on('pointerdown', this.#submit, this);
     }
 
 
     update() {
         // https://photonstorm.github.io/phaser3-docs/Phaser.Scene.html#update
+    }
+
+
+    #reset(pointer) {
+        this.unselected_cards.push(...this.selected_cards)
+        this.selected_cards = []
+        this.unselected_cards.forEach((card, i) => {
+            console.log(card.index)
+            card.setPosition(this.sys.canvas.width/2 - this.fieldWidth/2 + 100 * card.index + 50 + 10 * card.index + 10, this.sys.canvas.height * 0.7)
+        })
+    }
+
+    #submit(pointer) {
+        const str = this.selected_cards.map(card => card.rawText).join(" ")
+        console.log("submit string is ", str)
+        this.scene.start('ResultScene');
+    }
+
+
+    // used in card class
+    toSelectedField(card) {
+        const index = this.unselected_cards.findIndex(c => c.text == card.rawText)
+        // console.log(index)
+        if (index) {
+            this.unselected_cards.splice(index, 1)
+            this.selected_cards.push(card)
+            console.log(this.unselected_cards)
+            // console.log("==================")
+            // console.log(this.selected_cards)
+            // console.log(this.unselected_cards)
+            // console.log("==================")
+        } else {
+            return
+        }
+    }
+
+    toUnselectedField(card) {
+        const index = this.unselected_cards.findIndex(c => c.text == card.rawText)
+        // console.log(index)
+        if (index) {
+            this.selected_cards.splice(index, 1)
+            this.unselected_cards.push(card)
+            // console.log("==================")
+            // console.log(this.selected_cards)
+            // console.log(this.unselected_cards)
+            // console.log("==================")
+        } else {
+            return
+        }
     }
 }

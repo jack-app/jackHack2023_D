@@ -23,6 +23,8 @@ export class PlayParentScene extends Phaser.Scene {
         // This method is called by the Scene Manager when the scene starts, after init() and preload().
         // If the LoaderPlugin started after preload(), then this method is called only after loading is complete.
 
+
+
         // Set background image
         this.background = this.add.image(this.sys.canvas.width/2, this.sys.canvas.height/2, "background").setOrigin(.5, .5)
         this.background.displayWidth = this.sys.canvas.width;
