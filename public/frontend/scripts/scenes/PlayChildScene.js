@@ -166,7 +166,7 @@ export class PlayChildScene extends Phaser.Scene {
       (c) => c.rawText == card.rawText
     );
     console.log(index)
-    if (index) {
+    if (index!=-1) {
       this.unselected_cards.splice(index, 1);
       this.selected_cards.push(card);
       //   console.log("==================");
@@ -183,7 +183,7 @@ export class PlayChildScene extends Phaser.Scene {
       (c) => c.rawText == card.rawText
     );
     // console.log(index)
-    if (index) {
+    if (index!=-1) {
       this.selected_cards.splice(index, 1);
       this.unselected_cards.push(card);
       // console.log("==================")
