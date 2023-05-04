@@ -26,9 +26,6 @@ export class PlayChildScene extends Phaser.Scene {
     const url =
       "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/assets/images/arrow.png";
     this.load.image("arrow", url);
-
-    // load words
-    this.sample_wards = ["this", "is", "sample", "words"];
   }
 
   create() {
@@ -67,42 +64,52 @@ export class PlayChildScene extends Phaser.Scene {
     // これなに？？？
     this.input.addPointer(3);
 
-    // words から Cardを作成＆表示
-    this.unselected_cards = this.sample_wards.map(
-      (s, index) => new Card(this, s, index)
-    );
-    this.unselected_cards.forEach((card, i) => {
-      card.setPosition(
-        this.sys.canvas.width / 2 -
-          this.fieldWidth / 2 +
-          100 * i +
-          50 +
-          10 * i +
-          10,
-        this.sys.canvas.height * 0.7
+    socket.emit("sample-words", {}); // ここでサーバーにサンプルワードを要求
+
+    socket.on("sample-words", (data) => {
+      this.sample_words = data.sample_words;
+
+      // words から Cardを作成＆表示
+      this.unselected_cards = this.sample_words.map(
+        (s, index) => new Card(this, s, index)
       );
-      this.add.existing(card);
+      this.unselected_cards.forEach((card, i) => {
+        card.setPosition(
+          this.sys.canvas.width / 2 -
+            this.fieldWidth / 2 +
+            100 * i +
+            50 +
+            10 * i +
+            10,
+          this.sys.canvas.height * 0.7
+        );
+        this.add.existing(card);
+      });
+
+      this.reset = this.add
+        .text(
+          this.sys.canvas.width / 2 - 30,
+          this.sys.canvas.height / 2,
+          "reset"
+        )
+        .setFontSize(20)
+        .setFontFamily("Arial")
+        .setOrigin(0.5, 0.5)
+        .setInteractive();
+      this.reset.on("pointerdown", this.#reset, this);
+
+      this.submit = this.add
+        .text(
+          this.sys.canvas.width / 2 + 30,
+          this.sys.canvas.height / 2,
+          "submit"
+        )
+        .setFontSize(20)
+        .setFontFamily("Arial")
+        .setOrigin(0.5, 0.5)
+        .setInteractive();
+      this.submit.on("pointerdown", this.#submit, this);
     });
-
-    this.reset = this.add
-      .text(this.sys.canvas.width / 2 - 30, this.sys.canvas.height / 2, "reset")
-      .setFontSize(20)
-      .setFontFamily("Arial")
-      .setOrigin(0.5, 0.5)
-      .setInteractive();
-    this.reset.on("pointerdown", this.#reset, this);
-
-    this.submit = this.add
-      .text(
-        this.sys.canvas.width / 2 + 30,
-        this.sys.canvas.height / 2,
-        "submit"
-      )
-      .setFontSize(20)
-      .setFontFamily("Arial")
-      .setOrigin(0.5, 0.5)
-      .setInteractive();
-    this.submit.on("pointerdown", this.#submit, this);
 
     socket.on("finish-judge", (data) => {
       this.scene.start("ResultScene");
@@ -130,16 +137,10 @@ export class PlayChildScene extends Phaser.Scene {
   }
 
   #clear() {
-    console.log("-----selected-----");
-    this.selected_cards.forEach((card) => {
-      console.log(card.rawText);
-      card.destroy();
-    });
-    console.log("-----unselected-----");
-    this.unselected_cards.forEach((card) => {
-      console.log(card.rawText);
-      card.destroy();
-    });
+    //  console.log("-----selected-----");
+    this.selected_cards.forEach((card) => card.destroy());
+    //  console.log("-----unselected-----");
+    this.unselected_cards.forEach((card) => card.destroy());
     this.unselectedField.destroy();
     this.selectedField.destroy();
     this.reset.destroy();
