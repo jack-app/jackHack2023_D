@@ -10,7 +10,15 @@ app.use(express.static("public"));
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
 // 部屋一覧
-const ROOMS = { 0: { participants: {}, responded: 0, sentences: [] } };
+const ROOMS = {
+  0: {
+    participants: {},
+    responded: 0,
+    sentences: [],
+    win: "月が綺麗ですね",
+    lose: ["ほげほげ", "ふがふが"],
+  },
+};
 
 app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/frontend/index.html");
@@ -37,11 +45,6 @@ io.on("connection", (socket) => {
     // 本人にトークンを送付
     io.to(socket.id).emit("token", { token: token });
   })();
-
-  socket.emit("result", {
-    win: "月が綺麗ですね",
-    lose: ["ほげほげ", "ふがふが"],
-  });
 
   /**
    * [イベント] 入室する
@@ -132,9 +135,7 @@ io.on("connection", (socket) => {
     // トークンが正しければ
     //--------------------------
     if (authToken(socket.id, data.token)) {
-      // 本人にOK通知
-      io.to(socket.id).emit("result-result", { status: true });
-      socket.emit("result-sentences", { list: data.sentence });
+      socket.emit("result", { win: ROOMS[0].win, lose: ROOMS[0].lose });
     }
     //--------------------------
     // トークンが誤っていた場合

@@ -7,20 +7,12 @@ export const setSocket = (value) => {
 };
 
 const config = {
-    parent: 'mainFrame',
-    type: Phaser.AUTO,
-    height: 600,
-    width: 800,
-    scene: scenes,
-    backgroundColor: '#4488aa' // TODO: 要検討
-}
-
-const config = {
   parent: "mainFrame",
   type: Phaser.AUTO,
   height: 600,
   width: 800,
   scene: scenes,
+  backgroundColor: "#4488aa", // TODO: 要検討
 };
 
 class LoveGame extends Phaser.Game {
