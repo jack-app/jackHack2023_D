@@ -11,6 +11,8 @@ export class ResultScene extends Phaser.Scene {
   }
 
   preload() { this.load.image("background", "frontend/81643.png")
+  this.load.image("crown", "frontend/crown_10042.png")
+  this.load.image("background", "frontend/81643.png")
     // Can be defined on your own Scenes. Use it to load assets.
     // This method is called by the Scene Manager, after init() and before create(), only if the Scene has a LoaderPlugin.
     // After this method completes, if the LoaderPlugin's queue isn't empty, the LoaderPlugin will start automatically
