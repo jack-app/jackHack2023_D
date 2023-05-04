@@ -48,6 +48,7 @@ const ROOMS = {
     original_words: [],
     win: "月が綺麗ですね",
     lose: ["ほげほげ", "ふがふが"],
+    count:0
   },
 };
 
@@ -224,6 +225,17 @@ io.on("connection", (socket) => {
     //--------------------------
     if (authToken(socket.id, data.token)) {
       socket.emit("result", { win: ROOMS[0].win, lose: ROOMS[0].lose });
+      ROOMS[0].count++;
+      if(ROOMS[0].count==Object.keys(ROOMS[0].participants).length){
+        ROOMS[0]={participants: {},
+        responded: 0,
+        sentences: [],
+        original_words: [],
+        win: "月が綺麗ですね",
+        lose: ["ほげほげ", "ふがふが"],
+        count:0}
+
+      }
     }
     //--------------------------
     // トークンが誤っていた場合
