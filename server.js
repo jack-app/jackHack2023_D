@@ -11,7 +11,14 @@ const SECRET_TOKEN = "abcdefghijklmn12345";
 
 // 部屋一覧
 const ROOMS = {
-  0: { participants: {}, parent: null, sentences: [], original_words: [] },
+
+  0: {
+    participants: {},
+    responded: 0,
+    sentences: [],
+    win: "月が綺麗ですね",
+    lose: ["ほげほげ", "ふがふが"],
+  },
 };
 
 app.get("/", (req, res) => {
@@ -39,11 +46,6 @@ io.on("connection", (socket) => {
     // 本人にトークンを送付
     io.to(socket.id).emit("token", { token: token });
   })();
-
-  socket.emit("result", {
-    win: "月が綺麗ですね",
-    lose: ["ほげほげ", "ふがふが"],
-  });
 
   /**
    * [イベント] 入室する
@@ -123,6 +125,12 @@ io.on("connection", (socket) => {
       // 本人にOK通知
       io.to(socket.id).emit("submit-result", { status: true });
       ROOMS[0].sentences.push(data.sentence);
+      if (
+        ROOMS[0].sentences.length ==
+        Object.keys(ROOMS[0].participants).length - 1
+      ) {
+        io.emit("judge", { sentences: ROOMS[0].sentences });
+      }
     }
     //--------------------------
     // トークンが誤っていた場合
@@ -140,7 +148,11 @@ io.on("connection", (socket) => {
     if (authToken(socket.id, data.token)) {
       // 本人にOK通知
       io.to(socket.id).emit("judge-result", { status: true });
-      socket.emit("judge-list", { list: ROOMS[0].sentences });
+      ROOMS[0].win = ROOMS[0].sentences[data.win];
+      ROOMS[0].lose = ROOMS[0].sentences.filter(function (value) {
+        return !(value === ROOMS[0].win);
+      });
+      io.emit("finish-judge", {});
     }
     //--------------------------
     // トークンが誤っていた場合
@@ -156,9 +168,7 @@ io.on("connection", (socket) => {
     // トークンが正しければ
     //--------------------------
     if (authToken(socket.id, data.token)) {
-      // 本人にOK通知
-      io.to(socket.id).emit("result-result", { status: true });
-      socket.emit("result-sentences", { list: data.sentence });
+      socket.emit("result", { win: ROOMS[0].win, lose: ROOMS[0].lose });
     }
     //--------------------------
     // トークンが誤っていた場合

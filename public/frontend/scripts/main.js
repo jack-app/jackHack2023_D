@@ -12,6 +12,7 @@ const config = {
   height: 600,
   width: 800,
   scene: scenes,
+  backgroundColor: "#dddddd", // TODO: 要検討
 };
 
 class LoveGame extends Phaser.Game {
