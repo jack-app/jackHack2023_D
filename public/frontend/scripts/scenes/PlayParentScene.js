@@ -1,4 +1,3 @@
-import Card from "../helpers/card.js";
 import { socket } from "../main.js";
 
 export class PlayParentScene extends Phaser.Scene {
