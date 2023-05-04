@@ -8,14 +8,17 @@ export class PlayScene extends Phaser.Scene {
   init() {
     // Can be defined on your own Scenes.
     // This method is called by the Scene Manager when the scene starts, before preload() and create().
-
   }
 
   preload() {
     // Can be defined on your own Scenes. Use it to load assets.
     // This method is called by the Scene Manager, after init() and before create(), only if the Scene has a LoaderPlugin.
     // After this method completes, if the LoaderPlugin's queue isn't empty, the LoaderPlugin will start automatically
-    this.load.plugin('rextexteditplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rextexteditplugin.min.js', true);
+    this.load.plugin(
+      "rextexteditplugin",
+      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rextexteditplugin.min.js",
+      true
+    );
   }
 
   create() {
@@ -87,27 +90,44 @@ export class PlayScene extends Phaser.Scene {
         fontSize: 30,
         fontFamily: "Arial",
         origin: 0.5,
-      })
+      });
 
-      let editor = this.plugins.get('rextexteditplugin').add(please_text);
-      editor.open()
+      let editor = this.plugins.get("rextexteditplugin").add(please_text);
+      editor.open();
+      editor.on('pointerdown', function () {
+        var config = {
+            onTextChanged: function (textObject, text) {
+                textObject.text = text;
+                console.log(`Text: ${text}`);
+            },
+        };});
+      const submit = this.add
+        .text(150, 400, "Submit", {
+          fontSize: 30,
+          fontFamily: "Arial",
+          origin: 0.5,
+        })
+        .setInteractive();
 
-      const submit = this.add.text(150, 400, "Submit",{
-        fontSize: 30,
-        fontFamily: "Arial",
-        origin: 0.5,
-      }).setInteractive()
-      
-
-      submit.on("pointerdown", (pointer) => {
-
-        let inputText = editor.inputText.node
-        editor.close()
-        socket.emit("submit_word", { token: socket.token , submit_word: inputText});
-        console.log(inputText)
-
-      }, this)
- 
+      submit.on(
+        "pointerdown",
+        (pointer) => {
+          let inputText = editor.text;
+          console.log(inputText);
+          socket.emit("word", { token: socket.token, submit_word: inputText });
+          editor.close();
+          sceneName.destroy();
+          explanation.destroy();
+          please_text.destroy();
+          submit.destroy();
+          let wait_explanation = this.add.text(150, 130, "他の人の行動を待っています...", {
+            fontSize: 30,
+            fontFamily: "Arial",
+            origin: 0.5,
+          });
+        },
+        this
+      );
     });
 
     start_game.on(

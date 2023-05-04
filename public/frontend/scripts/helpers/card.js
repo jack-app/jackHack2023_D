@@ -33,8 +33,10 @@ export default class Card extends Phaser.GameObjects.Container {
 
   #onClick(pointer) {
     if (this.selected) {
+      // console.log("select")
       return
     } else {
+      this.selected = true
       this.setPosition(this.x, this.scene.sys.canvas.height * 0.3) // move to selected field
       this.scene.toSelectedField(this)
       this.setPosition(this.scene.sys.canvas.width / 2 - this.scene.fieldWidth / 2 + 100 * (this.scene.selected_cards.length-1) + 50 + 10 * (this.scene.selected_cards.length-1) + 10, this.scene.sys.canvas.height * 0.3)

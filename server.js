@@ -41,11 +41,11 @@ const other_words = [
 
 // 部屋一覧
 const ROOMS = {
-
   0: {
     participants: {},
     responded: 0,
     sentences: [],
+    original_words: [],
     win: "月が綺麗ですね",
     lose: ["ほげほげ", "ふがふが"],
   },
@@ -125,12 +125,11 @@ io.on("connection", (socket) => {
     // トークンが正しければ
     //--------------------------
     if (authToken(socket.id, data.token)) {
-      ROOMS[0].original_words.push(data.word);
+      ROOMS[0].original_words.push(data.submit_word);
       if (
         ROOMS[0].original_words.length ==
         Object.keys(ROOMS[0].participants).length
       ) {
-        io.emit("", { words: ROOMS[0].original_words });
         let parent_index = Math.floor(
           Math.random() * Object.keys(ROOMS[0].participants).length
         );
@@ -144,6 +143,32 @@ io.on("connection", (socket) => {
     else {
       // 本人にNG通知
       io.to(socket.id).emit("start-game-result", { status: false });
+    }
+  });
+
+  socket.on("sample-words", (data) => {
+    //--------------------------
+    // トークンが正しければ
+    //--------------------------
+    if (authToken(socket.id, data.token)) {
+      sample_words = [];
+      let random_num = Math.floor(Math.random() * 10 ** 9) + 10 ** 9;
+      sample_words.push(me[random_num % me.length]);
+      sample_words.push(you[random_num % you.length]);
+      sample_words.push(particle[random_num % particle.length]);
+      other_words_copy = other_words.slice();
+      for (let i = 0; i < 3; i++) {
+        sample_words.push(other_words_copy[random_num % other_words.length]);
+        other_words_copy.splice(random_num % other_words.length, 1);
+      }
+      sample_words.push(
+        ROOMS[0].original_words[random_num % ROOMS[0].original_words.length]
+      );
+      ROOMS[0].original_words.splice(
+        random_num % ROOMS[0].original_words.length,
+        1
+      );
+      io.to(socket.id).emit("sample-words", { sample_words: sample_words });
     }
   });
 
