@@ -102,6 +102,12 @@ io.on("connection", (socket) => {
       // 本人にOK通知
       io.to(socket.id).emit("submit-result", { status: true });
       ROOMS[0].sentences.push(data.sentence);
+      if (
+        ROOMS[0].sentences.length ==
+        Object.keys(ROOMS[0].participants).length - 1
+      ) {
+        io.emit("judge", { sentences: ROOMS[0].sentences });
+      }
     }
     //--------------------------
     // トークンが誤っていた場合
@@ -119,7 +125,11 @@ io.on("connection", (socket) => {
     if (authToken(socket.id, data.token)) {
       // 本人にOK通知
       io.to(socket.id).emit("judge-result", { status: true });
-      socket.emit("judge-list", { list: ROOMS[0].sentences });
+      ROOMS[0].win = ROOMS[0].sentences[data.win];
+      ROOMS[0].lose = ROOMS[0].sentences.filter(function (value) {
+        return !(value === ROOMS[0].win);
+      });
+      io.emit("finish-judge", {});
     }
     //--------------------------
     // トークンが誤っていた場合
