@@ -1,4 +1,5 @@
 import { socket } from "../main.js";
+
 export class PlayScene extends Phaser.Scene {
   constructor() {
     super({ key: "PlayScene" });
@@ -7,12 +8,14 @@ export class PlayScene extends Phaser.Scene {
   init() {
     // Can be defined on your own Scenes.
     // This method is called by the Scene Manager when the scene starts, before preload() and create().
+
   }
 
   preload() {
     // Can be defined on your own Scenes. Use it to load assets.
     // This method is called by the Scene Manager, after init() and before create(), only if the Scene has a LoaderPlugin.
     // After this method completes, if the LoaderPlugin's queue isn't empty, the LoaderPlugin will start automatically
+    this.load.plugin('rextexteditplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rextexteditplugin.min.js', true);
   }
 
   create() {
@@ -21,6 +24,21 @@ export class PlayScene extends Phaser.Scene {
     // If the LoaderPlugin started after preload(), then this method is called only after loading is complete.
 
     let player_count = null;
+    let explanation = null;
+
+    const sceneName = this.add
+      .text(150, 70, "PlayScene")
+      .setFontSize(30)
+      .setFontFamily("Arial")
+      .setOrigin(0.5)
+      .setInteractive();
+
+    const start_game = this.add
+      .text(150, 190, "Game Start!")
+      .setFontSize(20)
+      .setFontFamily("Arial")
+      .setOrigin(0.5)
+      .setInteractive();
 
     socket.emit("join", { token: socket.token, name: "hoge" });
 
@@ -35,6 +53,7 @@ export class PlayScene extends Phaser.Scene {
         player_count.setText(`${data.count}人が待機中`);
       }
     });
+
     socket.on("member-quit", (data) => {
       if (player_count == null) {
         player_count = this.add.text(150, 130, `${data.count}人が待機中`, {
@@ -47,37 +66,54 @@ export class PlayScene extends Phaser.Scene {
       }
     });
 
-    const sceneName = this.add
-      .text(150, 70, "PlayScene")
-      .setFontSize(30)
-      .setFontFamily("Arial")
-      .setOrigin(0.5)
-      .setInteractive();
-
-    const change_to_child = this.add
-      .text(150, 190, "To child scene")
-      .setFontSize(20)
-      .setFontFamily("Arial")
-      .setOrigin(0.5)
-      .setInteractive();
-    const change_to_parent = this.add
-      .text(150, 220, "To parent scene")
-      .setFontSize(20)
-      .setFontFamily("Arial")
-      .setOrigin(0.5)
-      .setInteractive();
-
-    change_to_child.on(
-      "pointerdown",
-      function (pointer) {
-        this.scene.start("PlayChildScene");
-      },
-      this
-    );
-    change_to_parent.on(
-      "pointerdown",
-      function (pointer) {
+    socket.on("start", (data) => {
+      if (data.parent == socket.id) {
         this.scene.start("PlayParentScene");
+      } else {
+        this.scene.start("PlayChildScene");
+      }
+    });
+
+    socket.on("create-word", (data) => {
+      player_count.destroy();
+      start_game.destroy();
+      explanation = this.add.text(150, 130, "オリジナルの単語を入力しよう", {
+        fontSize: 30,
+        fontFamily: "Arial",
+        origin: 0.5,
+      });
+
+      let please_text = this.add.text(150, 300, "Please input Text", {
+        fontSize: 30,
+        fontFamily: "Arial",
+        origin: 0.5,
+      })
+
+      let editor = this.plugins.get('rextexteditplugin').add(please_text);
+      editor.open()
+
+      const submit = this.add.text(150, 400, "Submit",{
+        fontSize: 30,
+        fontFamily: "Arial",
+        origin: 0.5,
+      }).setInteractive()
+      
+
+      submit.on("pointerdown", (pointer) => {
+
+        let inputText = editor.inputText.node
+        editor.close()
+        socket.emit("submit_word", { token: socket.token , submit_word: inputText});
+        console.log(inputText)
+
+      }, this)
+ 
+    });
+
+    start_game.on(
+      "pointerdown",
+      function (pointer) {
+        socket.emit("create-words", { token: socket.token });
       },
       this
     );
