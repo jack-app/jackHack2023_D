@@ -20,17 +20,11 @@ export class PlayParentScene extends Phaser.Scene {
         // Can be defined on your own Scenes. Use it to load assets.
         // This method is called by the Scene Manager, after init() and before create(), only if the Scene has a LoaderPlugin.
         // After this method completes, if the LoaderPlugin's queue isn't empty, the LoaderPlugin will start automatically
+        
+        this.load.plugin('rexcheckboxplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexcheckboxplugin.min.js', true);
 
-        // load image
         this.load.image("background", "frontend/81643.png")
 
-        // load dnd plugin
-        let url = 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexdragplugin.min.js';
-        this.load.plugin('rexdragplugin', url, true);
-
-        // load sample image
-        url = 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/assets/images/arrow.png';
-        this.load.image('arrow', url);
     }
 
 
@@ -39,49 +33,100 @@ export class PlayParentScene extends Phaser.Scene {
         // This method is called by the Scene Manager when the scene starts, after init() and preload().
         // If the LoaderPlugin started after preload(), then this method is called only after loading is complete.
 
-        // Set background image
-        this.background = this.add.image(this.sys.canvas.width/2, this.sys.canvas.height/2, "background").setOrigin(.5, .5)
-        this.background.displayWidth = this.sys.canvas.width;
-        this.background.displayHeight = this.sys.canvas.height;
+        let sentence_ls = ["hoge", "hogehoge", "huga", "hugahuga"];
 
+        const TIME_LIMIT = 30000;
+        const CHECKBOX_WIDTH = 30;
+        const Y_CHECKBOX_PER = 0.8
+        const X_TEXT_PUDDING = 10;
+        const CHECKBOX_HEIGHT = 30;
 
-        this.input.addPointer(3)
-        // this.input.on("pointerdown", (pointer) => {
-        //     const img = this.add.image(pointer.x, pointer.y, 'arrow');
-        //     img.drag = this.plugins.get('rexdragplugin').add(img);
-        //     img.drag.drag();
-        //     img.on('dragend', img.destroy, img);
-        // }, this)
+        let x, y;
+        let checkbox;
+        
+        this.checkbox_ls = [];
+        this.TIMEOUT = false
+        this.THIS_GAME_END = false
 
+        const player_num = sentence_ls.length;
+        const sys_height = this.sys.canvas.height;
 
+        this.background = this.add.image(0, 0, "background").setOrigin(.5, .5)
+        this.background.displayHeight = this.sys.canvas.height
+        this.background.displayWidth  = this.sys.canvas.width
+        console.log(this.sys.canvas.width)
+        this.background.setSize(this.sys.canvas.width, this.sys.canvas.height)
 
-        this.cards = [
-            new Card(this, 100, 100, "this"),
-            new Card(this, 100, 200, "is"),
-            new Card(this, 100, 300, "sample"),
-            new Card(this, 100, 400, "text")
-        ]
+        for(let i = 0;i < player_num; i++){
 
-        // console.log(this.input)
-        // console.log(this.cards)
-        // this.input.setDraggable(this.cards[0])
-        this.cards.forEach(card => {
-            this.add.existing(card)
-        })
+            x = CHECKBOX_WIDTH / 2;
+            y = sys_height * Y_CHECKBOX_PER * i / player_num + CHECKBOX_HEIGHT / 2;
 
+            checkbox = this.add.rexCheckbox(x, y, CHECKBOX_WIDTH, CHECKBOX_HEIGHT)
+            this.checkbox_ls.push(checkbox)
 
-        // change scene
-        const sceneName = this.add.text(150, 70, 'PlayParentScene').setFontSize(30).setFontFamily("Arial").setOrigin(0.5).setInteractive();
+            x = CHECKBOX_WIDTH + X_TEXT_PUDDING
+            
+            this.add.text(x, y, sentence_ls[i]);
 
-	    const change = this.add.text(150, 130, 'To Result Scene').setFontSize(20).setFontFamily("Arial").setOrigin(0.5).setInteractive();
+        }
 
-        change.on('pointerdown', function (pointer) {
-            this.scene.start('ResultScene');
-        }, this);
+        y = sys_height * Y_CHECKBOX_PER + CHECKBOX_HEIGHT / 2;
+
+        this.time.addEvent({
+            delay: TIME_LIMIT,
+            callback: () => {
+
+                if(!this.THIS_GAME_END){
+
+                    this.TIMEOUT = true;
+
+                    alert('Time Limit');
+
+                }  
+            },
+          });
+        
+
     }
 
 
-    update() {
+    update(time, delta) {
         // https://photonstorm.github.io/phaser3-docs/Phaser.Scene.html#update
+        
+        let winner = -1;
+
+        if(this.TIMEOUT){
+
+            // winnerは今回のサイクルの勝者
+            winner = Math.floor(Math.random() * this.checkbox_ls.length)
+            console.log(winner)
+            this.THIS_GAME_END = true
+            this.scene.start('ResultScene');    
+
+        }
+        else{
+
+            let true_count = 0;
+
+            for(let i=0; i < this.checkbox_ls.length; i++){    
+
+
+                if(this.checkbox_ls[i].checked){
+
+                    true_count++;
+                    winner = i
+
+                }
+            }
+
+            if(true_count == 1){
+
+                console.log(winner)
+                this.THIS_GAME_END = true
+                this.scene.start('ResultScene');       
+            
+            }
+        }
     }
 }

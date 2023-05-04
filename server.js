@@ -10,7 +10,7 @@ app.use(express.static("public"));
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
 // 部屋一覧
-const ROOMS = { 0: { participants: [], responded: 0, sentences: [] } };
+const ROOMS = { 0: { participants: {}, responded: 0, sentences: [] } };
 
 app.get("/", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/frontend/index.html");
@@ -18,10 +18,6 @@ app.get("/", (req, res) => {
 
 app.get("/play", (req, res) => {
   res.sendFile(DOCUMENT_ROOT + "/frontend/play.html");
-});
-
-app.get("/result", (req, res) => {
-  res.sendFile(DOCUMENT_ROOT + "/result.html");
 });
 
 //-----------------------------------------------
@@ -56,13 +52,13 @@ io.on("connection", (socket) => {
     //--------------------------
     if (authToken(socket.id, data.token)) {
       // 入室OK + 現在の入室者を通知
-      ROOMS[0].participants.push({ id: socket.id, name: data.name });
+      ROOMS[0].participants[socket.id] = { name: data.name, token: data.token };
       io.to(socket.id).emit("join-result", {
         status: true,
       });
 
-      socket.emit("member-join", {
-        count: ROOMS[0].participants.length,
+      io.emit("member-join", {
+        count: Object.keys(ROOMS[0].participants).length,
       });
     }
     //--------------------------
@@ -148,6 +144,17 @@ io.on("connection", (socket) => {
       io.to(socket.id).emit("result-result", { status: false });
     }
   });
+  /**
+   * [イベント] 退室する
+   */
+  socket.on("disconnect", () => {
+    io.emit("member-quit", {
+      count: Object.keys(ROOMS[0].participants).length - 1,
+      perticipant: ROOMS[0].participants[socket.id],
+    });
+    // 削除
+    delete ROOMS[0].participants[socket.id];
+  });
 });
 
 http.listen(3000, () => {
@@ -161,4 +168,10 @@ function makeToken(id) {
 function makeRoomid() {
   const str = SECRET_TOKEN + id;
   return crypto.createHash("sha1").update(str).digest("hex");
+}
+function authToken(socketid, token) {
+  return (
+    //(socketid in Object.keys(ROOMS[0].participants) && (token === ROOMS[0].participants.socketid.token)
+    true
+  );
 }
