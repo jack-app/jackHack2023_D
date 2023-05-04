@@ -1,10 +1,11 @@
 const crypto = require("crypto");
-const app = require("express")();
+const express = require("express");
+const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 
 const DOCUMENT_ROOT = __dirname + "/public";
-
+app.use(express.static("public"));
 // トークンを作成する際の秘密鍵
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
@@ -54,7 +55,7 @@ io.on("connection", (socket) => {
     // トークンが正しければ
     //--------------------------
     if (authToken(socket.id, data.token)) {
-      // 入室OK + 現在の入室者数を通知
+      // 入室OK + 現在の入室者を通知
       ROOMS[0].participants.push({ id: socket.id, name: data.name });
       io.to(socket.id).emit("join-result", {
         status: true,
