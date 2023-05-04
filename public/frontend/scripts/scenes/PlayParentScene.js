@@ -1,3 +1,4 @@
+import Card from "../helpers/card.js";
 
 export class PlayParentScene extends Phaser.Scene {
     constructor() {
@@ -8,6 +9,10 @@ export class PlayParentScene extends Phaser.Scene {
     init() {
         // Can be defined on your own Scenes.
         // This method is called by the Scene Manager when the scene starts, before preload() and create().
+
+        // definition of padding X and Y
+        this.paddingX = this.sys.canvas.width * 0.1
+        this.paddingY = this.sys.canvas.height * 0.1
     }
 
 
@@ -15,7 +20,7 @@ export class PlayParentScene extends Phaser.Scene {
         // Can be defined on your own Scenes. Use it to load assets.
         // This method is called by the Scene Manager, after init() and before create(), only if the Scene has a LoaderPlugin.
         // After this method completes, if the LoaderPlugin's queue isn't empty, the LoaderPlugin will start automatically
-
+        
         this.load.plugin('rexcheckboxplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexcheckboxplugin.min.js', true);
 
         this.load.image("background", "frontend/81643.png")
