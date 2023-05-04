@@ -9,14 +9,43 @@ app.use(express.static("public"));
 // トークンを作成する際の秘密鍵
 const SECRET_TOKEN = "abcdefghijklmn12345";
 
+const me = ["僕", "僕が", "僕に", "僕の", "僕と"];
+const you = ["君", "君が", "君に", "君の", "君と"];
+const particle = ["て", "に", "を", "は", "が"];
+const other_words = [
+  "家",
+  "犬",
+  "見てみたい",
+  "ぶち壊して",
+  "ダメですか？",
+  "まぶしい",
+  "女神",
+  "叫んでる",
+  "セクシーな",
+  "夜ごはん",
+  "小悪魔な",
+  "顔",
+  "お母さん",
+  "プレイボーイ",
+  "ちゃんと",
+  "大切にするよ",
+  "お嫁",
+  "美しい",
+  "そろそろ",
+  "したいんだ",
+  "誰よりも",
+];
+
 // 部屋一覧
 const ROOMS = {
   0: {
     participants: {},
     responded: 0,
     sentences: [],
+    original_words: [],
     win: "月が綺麗ですね",
     lose: ["ほげほげ", "ふがふが"],
+    count:0
   },
 };
 
@@ -73,24 +102,71 @@ io.on("connection", (socket) => {
     }
   });
 
-  /**
-   * [イベント] ゲームを開始する
-   */
-  socket.on("start", (data) => {
+  socket.on("create-words", (data) => {
     //--------------------------
     // トークンが正しければ
     //--------------------------
     if (authToken(socket.id, data.token)) {
-      // 本人にOK通知
-      io.to(socket.id).emit("start-result", { status: true });
-      socket.broadcast.emit("start-game", {});
+      io.emit("create-word", {});
     }
     //--------------------------
     // トークンが誤っていた場合
     //--------------------------
     else {
       // 本人にNG通知
-      io.to(socket.id).emit("start-result", { status: false });
+      io.to(socket.id).emit("start-game-result", { status: false });
+    }
+  });
+
+  socket.on("word", (data) => {
+    //--------------------------
+    // トークンが正しければ
+    //--------------------------
+    if (authToken(socket.id, data.token)) {
+      ROOMS[0].original_words.push(data.submit_word);
+      if (
+        ROOMS[0].original_words.length ==
+        Object.keys(ROOMS[0].participants).length
+      ) {
+        let parent_index = Math.floor(
+          Math.random() * Object.keys(ROOMS[0].participants).length
+        );
+        ROOMS[0].parent = Object.keys(ROOMS[0].participants)[parent_index];
+        io.emit("start", { parent: ROOMS[0].parent });
+      }
+    }
+    //--------------------------
+    // トークンが誤っていた場合
+    //--------------------------
+    else {
+      // 本人にNG通知
+      io.to(socket.id).emit("start-game-result", { status: false });
+    }
+  });
+
+  socket.on("sample-words", (data) => {
+    //--------------------------
+    // トークンが正しければ
+    //--------------------------
+    if (authToken(socket.id, data.token)) {
+      sample_words = [];
+      let random_num = Math.floor(Math.random() * 10 ** 9) + 10 ** 9;
+      sample_words.push(me[random_num % me.length]);
+      sample_words.push(you[random_num % you.length]);
+      sample_words.push(particle[random_num % particle.length]);
+      let other_words_copy = other_words.slice();
+      for (let i = 0; i < 6; i++) {
+        sample_words.push(other_words_copy[random_num % other_words.length]);
+        other_words_copy.splice(random_num % other_words.length, 1);
+      }
+      sample_words.push(
+        ROOMS[0].original_words[random_num % ROOMS[0].original_words.length]
+      );
+      ROOMS[0].original_words.splice(
+        random_num % ROOMS[0].original_words.length,
+        1
+      );
+      io.to(socket.id).emit("sample-words", { sample_words: sample_words });
     }
   });
 
@@ -102,6 +178,12 @@ io.on("connection", (socket) => {
       // 本人にOK通知
       io.to(socket.id).emit("submit-result", { status: true });
       ROOMS[0].sentences.push(data.sentence);
+      if (
+        ROOMS[0].sentences.length ==
+        Object.keys(ROOMS[0].participants).length - 1
+      ) {
+        io.emit("judge", { sentences: ROOMS[0].sentences });
+      }
     }
     //--------------------------
     // トークンが誤っていた場合
@@ -119,7 +201,11 @@ io.on("connection", (socket) => {
     if (authToken(socket.id, data.token)) {
       // 本人にOK通知
       io.to(socket.id).emit("judge-result", { status: true });
-      socket.emit("judge-list", { list: ROOMS[0].sentences });
+      ROOMS[0].win = ROOMS[0].sentences[data.win];
+      ROOMS[0].lose = ROOMS[0].sentences.filter(function (value) {
+        return !(value === ROOMS[0].win);
+      });
+      io.emit("finish-judge", {});
     }
     //--------------------------
     // トークンが誤っていた場合
@@ -136,6 +222,17 @@ io.on("connection", (socket) => {
     //--------------------------
     if (authToken(socket.id, data.token)) {
       socket.emit("result", { win: ROOMS[0].win, lose: ROOMS[0].lose });
+      ROOMS[0].count++;
+      if(ROOMS[0].count==Object.keys(ROOMS[0].participants).length){
+        ROOMS[0]={participants: {},
+        responded: 0,
+        sentences: [],
+        original_words: [],
+        win: "月が綺麗ですね",
+        lose: ["ほげほげ", "ふがふが"],
+        count:0}
+
+      }
     }
     //--------------------------
     // トークンが誤っていた場合

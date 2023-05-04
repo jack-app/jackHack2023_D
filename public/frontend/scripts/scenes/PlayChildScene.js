@@ -1,38 +1,229 @@
+import Card from "../helpers/card.js";
+import { socket } from "../main.js";
 
 export class PlayChildScene extends Phaser.Scene {
-    constructor() {
-        super({ key: "PlayChildScene" })
+  constructor() {
+    super({ key: "PlayChildScene" });
+  }
+
+  init() {
+    // definition of padding X and Y
+    const padding_x_ratio = 0.15;
+    const padding_y_ratio = 0.2;
+    this.paddingX = this.sys.canvas.width * padding_x_ratio;
+    this.paddingY = this.sys.canvas.height * padding_y_ratio;
+    this.fieldWidth = this.sys.canvas.width - this.paddingX * 2;
+
+    this.selected_cards = [];
+    this.unselected_cards = [];
+  }
+
+  preload() {
+    // load image
+    this.load.image("background", "frontend/81643.png");
+
+    // load sample image
+    const url =
+      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/assets/images/arrow.png";
+    this.load.image("arrow", url);
+  }
+
+  create() {
+    // Set background image
+    this.background = this.add
+      .image(
+        this.sys.canvas.width / 2,
+        this.sys.canvas.height / 2,
+        "background"
+      )
+      .setOrigin(0.5, 0.5);
+    this.background.displayWidth = this.sys.canvas.width;
+    this.background.displayHeight = this.sys.canvas.height;
+
+    this.selectedField = this.add
+      .rectangle(
+        this.sys.canvas.width / 2,
+        this.sys.canvas.height * 0.3,
+        this.fieldWidth,
+        120,
+        0xffffff,
+        0.5
+      )
+      .setOrigin(0.5, 0.5); // 左上の座標基準
+    this.unselectedField = this.add
+      .rectangle(
+        this.sys.canvas.width / 2,
+        this.sys.canvas.height * 0.7,
+        this.fieldWidth,
+        120,
+        0xffffff,
+        0.5
+      )
+      .setOrigin(0.5, 0.5); // 左上の座標基準
+
+    // これなに？？？
+    this.input.addPointer(3);
+
+    socket.emit("sample-words", {}); // ここでサーバーにサンプルワードを要求
+
+    socket.on("sample-words", (data) => {
+      this.sample_words = data.sample_words;
+
+      // words から Cardを作成＆表示
+      this.unselected_cards = this.sample_words.map(
+        (s, index) => new Card(this, s, index)
+      );
+      this.unselected_cards.forEach((card, i) => {
+        if (i<5){
+          card.setPosition(
+            this.sys.canvas.width / 2 -
+              this.fieldWidth / 2 +
+              100 * card.index +
+              50 +
+              10 * card.index +
+              10,
+            this.sys.canvas.height * 0.65
+          );
+        }
+        else{
+          card.setPosition(
+            this.sys.canvas.width / 2 -
+              this.fieldWidth / 2 +
+              100 * (card.index-5) +
+              50 +
+              10 * (card.index-5) +
+              10,
+            this.sys.canvas.height * 0.75
+          );
+        }
+        this.add.existing(card);
+      });
+
+      this.reset = this.add
+        .text(
+          this.sys.canvas.width / 2 - 100,
+          this.sys.canvas.height / 2,
+          "リセット"
+        )
+        .setColor("#000000")
+        .setFontSize(20)
+        .setFontFamily("Arial")
+        .setOrigin(0.5, 0.5)
+        .setInteractive();
+      this.reset.on("pointerdown", this.#reset, this);
+
+      this.submit = this.add
+        .text(
+          this.sys.canvas.width / 2 + 100,
+          this.sys.canvas.height / 2,
+          "プロポーズ"
+        )
+        .setColor("#000000")
+        .setFontSize(20)
+        .setFontFamily("Arial")
+        .setOrigin(0.5, 0.5)
+        .setInteractive();
+      this.submit.on("pointerdown", this.#submit, this);
+    });
+
+    socket.on("finish-judge", (data) => {
+      this.scene.start("ResultScene");
+    });
+  }
+
+  update() {
+    // https://photonstorm.github.io/phaser3-docs/Phaser.Scene.html#update
+  }
+
+  #reset(pointer) {
+    this.selected_cards.forEach((card) => {
+      card.selected = false;
+    });
+    this.unselected_cards.push(...this.selected_cards);
+    this.selected_cards = [];
+    this.unselected_cards.forEach((card, i) => {
+      if (i<5){
+      card.setPosition(
+        this.sys.canvas.width / 2 -
+          this.fieldWidth / 2 +
+          100 * i +
+          50 +
+          10 * i +
+          10,
+        this.sys.canvas.height * 0.65
+      );
     }
-
-
-    init() {
-        // Can be defined on your own Scenes.
-        // This method is called by the Scene Manager when the scene starts, before preload() and create().
+    else{
+      card.setPosition(
+        this.sys.canvas.width / 2 -
+          this.fieldWidth / 2 +
+          100 * (i-5) +
+          50 +
+          10 * (i-5) +
+          10,
+        this.sys.canvas.height * 0.75
+      );
     }
+  });
+  }
 
+  #clear() {
+    //  console.log("-----unselected-----");
+    this.unselected_cards.forEach((card) => card.destroy());
+    //  console.log("-----selected-----");
+    this.selected_cards.forEach((card) => card.destroy());
+    this.unselectedField.destroy();
+    this.selectedField.destroy();
+    this.reset.destroy();
+    this.submit.destroy();
+  }
 
-    preload() {
-        // Can be defined on your own Scenes. Use it to load assets.
-        // This method is called by the Scene Manager, after init() and before create(), only if the Scene has a LoaderPlugin.
-        // After this method completes, if the LoaderPlugin's queue isn't empty, the LoaderPlugin will start automatically
+  #submit(pointer) {
+    const str = this.selected_cards.map((card) => card.rawText).join(" ");
+    console.log("submit string is ", str);
+    socket.emit("submit", { sentence: str });
+    this.#clear();
+    let wait_sentence = this.add
+      .text(400, 150, "他の人の行動を待っています...")
+      .setColor("#000000")
+      .setFontSize(30)
+      .setFontFamily("Arial")
+      .setOrigin(0.5)
+      .setInteractive();
+  }
+
+  // used in card class
+  toSelectedField(card) {
+    const index = this.unselected_cards.findIndex(
+      (c) => c.rawText == card.rawText
+    );
+    console.log(index)
+    if (index!=-1) {
+      this.unselected_cards.splice(index, 1);
+      this.selected_cards.push(card);
+      //   console.log("==================");
+      //   console.log(this.selected_cards);
+      //   console.log(this.unselected_cards);
+      //   console.log("==================");
+    } else {
+      return;
     }
+  }
 
-
-    create() {
-        // Can be defined on your own Scenes. Use it to create your game objects.
-        // This method is called by the Scene Manager when the scene starts, after init() and preload().
-        // If the LoaderPlugin started after preload(), then this method is called only after loading is complete.
-        const sceneName = this.add.text(150, 70, 'PlayChildScene').setFontSize(30).setFontFamily("Arial").setOrigin(0.5).setInteractive();
-
-	    const change = this.add.text(150, 130, 'To Result Scene').setFontSize(20).setFontFamily("Arial").setOrigin(0.5).setInteractive();
-
-        change.on('pointerdown', function (pointer) {
-            this.scene.start('ResultScene');
-        }, this);
+  toUnselectedField(card) {
+    const index = this.unselected_cards.findIndex(
+      (c) => c.rawText == card.rawText
+    );
+    // console.log(index)
+    if (index!=-1) {
+      this.selected_cards.splice(index, 1);
+      this.unselected_cards.push(card);
+      // console.log("==================")
+      // console.log(this.selected_cards)
+      // console.log(this.unselected_cards)
+      // console.log("==================")
+    } else {
+      return;
     }
-
-
-    update() {
-        // https://photonstorm.github.io/phaser3-docs/Phaser.Scene.html#update
-    }
+  }
 }
