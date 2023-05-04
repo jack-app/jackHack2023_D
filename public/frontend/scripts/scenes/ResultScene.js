@@ -11,12 +11,15 @@ export class ResultScene extends Phaser.Scene {
   }
 
   preload() { this.load.image("background", "frontend/81643.png")
-  //this.load.image("heart", "frontend/heart_illust_1282.png")
-  this.load.image("background", "frontend/81643.png")
+  this.load.image("heart", "frontend/heart-st1.png")
+  this.load.image("crown", "frontend/crown_10042.png")
+  this.load.image("namae", "frontend/gazoumei.png")
     // Can be defined on your own Scenes. Use it to load assets.
     // This method is called by the Scene Manager, after init() and before create(), only if the Scene has a LoaderPlugin.
     // After this method completes, if the LoaderPlugin's queue isn't empty, the LoaderPlugin will start automatically
   }
+
+  
 
   create() {
     // Can be defined on your own Scenes. Use it to create your game objects.
@@ -51,10 +54,11 @@ export class ResultScene extends Phaser.Scene {
       console.log(this.sys.canvas.width)
       this.background.setSize(this.sys.canvas.width, this.sys.canvas.height)
 
-      // this.image = this.add.image(400, 300, "heart").setOrigin(.5, .5)
-      // this.image.setSize(10,10)
+       this.document = this.add.image(150,500,"heart").setOrigin(.5,.5)
+       this.document = this.add.image(400,300,"heart").setOrigin(.5,.5)
+       this.document = this.add.image(400,300,"crown").setOrigin(.5,.5)
+       this.document = this.add.image(400,300,"namae").setOrigin(.5,.5)
     });
-
     // const sceneName = this.add.text(150, 70, 'ResultScene').setFontSize(30).setFontFamily("Arial").setOrigin(0.5).setInteractive();
 
     const change = this.add
