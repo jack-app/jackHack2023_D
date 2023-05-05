@@ -35,7 +35,7 @@ export class StartScene extends Phaser.Scene {
     this.background.setSize(sys_width, sys_height);
 
     const sceneName = this.add
-      .text(400, 200, "Love game")
+      .text(400, 200, "Romantext")
       .setColor("#000000")
       .setFontSize(80)
       .setFontFamily("Helvetica")
