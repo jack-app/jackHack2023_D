@@ -43,9 +43,9 @@ export class StartScene extends Phaser.Scene {
       .setInteractive();
 
     const change = this.add
-      .text(380, 400, "START")
+      .text(380, 400, "入室")
       .setColor("#000000")
-      .setFontSize(20)
+      .setFontSize(30)
       .setFontFamily("Arial")
       .setOrigin(0.5)
       .setInteractive();
