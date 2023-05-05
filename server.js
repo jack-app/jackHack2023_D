@@ -34,6 +34,31 @@ const other_words = [
   "そろそろ",
   "したいんだ",
   "誰よりも",
+  "愛してる",
+  "祈ってる",
+  "お願い",
+  "ずっと",
+  "この感情",
+  "尊い",
+  "パーフェクト",
+  "尻に敷かれる",
+  "味噌汁",
+  "墓",
+  "ナイト",
+  "悲しいとき",
+  "未来",
+  "あの日見た",
+  "天使",
+  "太陽",
+  "宝石箱",
+  "ロマンチック",
+  "逃がさない",
+  "彷徨う",
+  "圧倒的",
+  "激しく",
+  "そばにいたい",
+  "に変わる",
+  "なんちゃって"
 ];
 
 // 部屋一覧
@@ -149,13 +174,13 @@ io.on("connection", (socket) => {
     // トークンが正しければ
     //--------------------------
     if (authToken(socket.id, data.token)) {
-      sample_words = [];
+      sample_words = ["愛してる"];
       let random_num = Math.floor(Math.random() * 10 ** 9) + 10 ** 9;
       sample_words.push(me[random_num % me.length]);
       sample_words.push(you[random_num % you.length]);
       sample_words.push(particle[random_num % particle.length]);
       let other_words_copy = other_words.slice();
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 5; i++) {
         sample_words.push(other_words_copy[random_num % other_words.length]);
         other_words_copy.splice(random_num % other_words.length, 1);
       }
