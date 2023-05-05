@@ -67,9 +67,8 @@ export class ResultScene extends Phaser.Scene {
     // const sceneName = this.add.text(150, 70, 'ResultScene').setFontSize(30).setFontFamily("Arial").setOrigin(0.5).setInteractive();
 
     const change = this.add
-      .text(600, 500, "もどる")
+      .text(600, 500, "return")
       .setFontSize(20)
-      .setFontFamily("Arial")
       .setOrigin(0.5)
       .setInteractive();
 
