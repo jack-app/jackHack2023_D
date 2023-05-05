@@ -11,8 +11,9 @@ export class ResultScene extends Phaser.Scene {
   }
 
   preload() { this.load.image("background", "frontend/81643.png")
-  this.load.image("heart", "frontend/heart-st1.png")
+  this.load.image("heart1", "frontend/heart_shape-2.png")
   this.load.image("crown", "frontend/crown_10042.png")
+   this.load.image("heart2", "frontend/heart_shape-2 (1).png")
   //this.load.image("namae", "frontend/gazoumei.png")
     // Can be defined on your own Scenes. Use it to load assets.
     // This method is called by the Scene Manager, after init() and before create(), only if the Scene has a LoaderPlugin.
@@ -32,8 +33,11 @@ export class ResultScene extends Phaser.Scene {
       this.win_str = data.win; // string
       this.lose_str = data.lose; // array<string>
 
+      this.add.text(320, 100, "result",{
+          fontSize: 50})
+
       this.add
-        .text(150, 80, this.win_str, {
+        .text(150, 170, this.win_str, {
           fontSize: 50,
           fontFamily: "Arial",
           origin: 0.5,
@@ -41,7 +45,7 @@ export class ResultScene extends Phaser.Scene {
         .setInteractive();
       this.lose_str.forEach((d, i) => {
         this.add
-          .text(150, 140+ i * 40, d, {
+          .text(150, 270+ i * 40, d, {
             fontSize: 30,
             fontFamily: "Arial",
             origin: 0.5,
@@ -54,15 +58,15 @@ export class ResultScene extends Phaser.Scene {
       console.log(this.sys.canvas.width)
       this.background.setSize(this.sys.canvas.width, this.sys.canvas.height)
 
-       this.document = this.add.image(150,500,"heart").setOrigin(.5,.5)
-       this.document = this.add.image(400,300,"heart").setOrigin(.5,.5)
-       this.document = this.add.image(400,300,"crown").setOrigin(.5,.5)
+       this.document = this.add.image(105,450,"heart1").setOrigin(.5,.5)
+       this.document = this.add.image(700,300,"heart2").setOrigin(.5,.5)
+       this.document = this.add.image(110,195,"crown").setOrigin(.5,.5)
        //this.document = this.add.image(400,300,"namae").setOrigin(.5,.5)
     });
     // const sceneName = this.add.text(150, 70, 'ResultScene').setFontSize(30).setFontFamily("Arial").setOrigin(0.5).setInteractive();
 
     const change = this.add
-      .text(150, 400, "もどる")
+      .text(600, 500, "もどる")
       .setFontSize(20)
       .setFontFamily("Arial")
       .setOrigin(0.5)
