@@ -11,9 +11,9 @@ export class ResultScene extends Phaser.Scene {
   }
 
   preload() { this.load.image("background", "frontend/81643.png")
-  this.load.image("heart1", "frontend/heart_shape-2.png")
-  this.load.image("crown", "frontend/crown_10042.png")
-   this.load.image("heart2", "frontend/heart_shape-2 (1).png")
+  this.load.image("heart1", "frontend/heart-bo2.png")
+  this.load.image("crown", "frontend/crown-black2.png")
+   this.load.image("heart2", "frontend/heart-bo1.png")
   //this.load.image("namae", "frontend/gazoumei.png")
     // Can be defined on your own Scenes. Use it to load assets.
     // This method is called by the Scene Manager, after init() and before create(), only if the Scene has a LoaderPlugin.
