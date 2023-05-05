@@ -201,7 +201,7 @@ io.on("connection", (socket) => {
     if (authToken(socket.id, data.token)) {
       // 本人にOK通知
       io.to(socket.id).emit("judge-result", { status: true });
-      ROOMS[0].win = ROOMS[0].sentences[data.win];
+      ROOMS[0].win = ROOMS[0].sentences[data.winner];
       ROOMS[0].lose = ROOMS[0].sentences.filter(function (value) {
         return !(value === ROOMS[0].win);
       });
