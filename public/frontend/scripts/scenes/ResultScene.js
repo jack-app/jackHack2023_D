@@ -35,6 +35,8 @@ export class ResultScene extends Phaser.Scene {
 
       this.add.text(250, 100, "【result】",{
           fontSize: 50,
+          color:"#000000"
+          
           })
 
       this.add
@@ -42,6 +44,7 @@ export class ResultScene extends Phaser.Scene {
           fontSize: 50,
           fontFamily: "游明朝",
           origin: 0.5,
+          color:"#000000"
         })
         .setInteractive();
       this.lose_str.forEach((d, i) => {
@@ -50,6 +53,7 @@ export class ResultScene extends Phaser.Scene {
             fontSize: 30,
             fontFamily: "游明朝",
             origin: 0.5,
+            color:"#000000"
           })
           .setInteractive();
       });
@@ -70,7 +74,9 @@ export class ResultScene extends Phaser.Scene {
       .text(600, 500, "return")
       .setFontSize(20)
       .setOrigin(0.5)
-      .setInteractive();
+      .setInteractive()
+      .setColor("#000000")
+      
 
     change.on(
       "pointerdown",
