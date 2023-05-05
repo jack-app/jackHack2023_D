@@ -154,8 +154,8 @@ io.on("connection", (socket) => {
       sample_words.push(me[random_num % me.length]);
       sample_words.push(you[random_num % you.length]);
       sample_words.push(particle[random_num % particle.length]);
-      other_words_copy = other_words.slice();
-      for (let i = 0; i < 3; i++) {
+      let other_words_copy = other_words.slice();
+      for (let i = 0; i < 6; i++) {
         sample_words.push(other_words_copy[random_num % other_words.length]);
         other_words_copy.splice(random_num % other_words.length, 1);
       }
