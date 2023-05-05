@@ -10,7 +10,7 @@ export default class Card extends Phaser.GameObjects.Container {
     this.index = index
 
     // card frame
-    this.card = scene.add.rectangle(0, 0, 100, 100, 0xffffff);
+    this.card = scene.add.rectangle(0, 0, 100, 40, 0xffffff);
     this.add(this.card);
 
     // card text
@@ -19,7 +19,7 @@ export default class Card extends Phaser.GameObjects.Container {
     this.add(this.text);
 
     // enable dnd
-    this.setSize(100, 100) // この辺でスケールとかサイズとか調整
+    this.setSize(100, 40) // この辺でスケールとかサイズとか調整
     this.setInteractive()
     this.scene.input.setDraggable(this);
     this.scene.input.on('dragstart', this.#dragStart);
@@ -39,7 +39,7 @@ export default class Card extends Phaser.GameObjects.Container {
       this.selected = true
       this.setPosition(this.x, this.scene.sys.canvas.height * 0.3) // move to selected field
       this.scene.toSelectedField(this)
-      this.setPosition(this.scene.sys.canvas.width / 2 - this.scene.fieldWidth / 2 + 100 * (this.scene.selected_cards.length-1) + 50 + 10 * (this.scene.selected_cards.length-1) + 10, this.scene.sys.canvas.height * 0.3)
+      this.setPosition(this.scene.sys.canvas.width / 2 - this.scene.fieldWidth / 2 + 100 * ((this.scene.selected_cards.length-1)%5) + 50 + 10 * ((this.scene.selected_cards.length-1)%5) + 10, this.scene.sys.canvas.height * (0.25+0.1*(((this.scene.selected_cards.length-1)/5)|0)))
       // console.log(this.x, this.y)
     }
   }

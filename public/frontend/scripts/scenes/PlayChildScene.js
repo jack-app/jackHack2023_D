@@ -74,15 +74,28 @@ export class PlayChildScene extends Phaser.Scene {
         (s, index) => new Card(this, s, index)
       );
       this.unselected_cards.forEach((card, i) => {
-        card.setPosition(
-          this.sys.canvas.width / 2 -
-            this.fieldWidth / 2 +
-            100 * i +
-            50 +
-            10 * i +
-            10,
-          this.sys.canvas.height * 0.7
-        );
+        if (i<5){
+          card.setPosition(
+            this.sys.canvas.width / 2 -
+              this.fieldWidth / 2 +
+              100 * card.index +
+              50 +
+              10 * card.index +
+              10,
+            this.sys.canvas.height * 0.65
+          );
+        }
+        else{
+          card.setPosition(
+            this.sys.canvas.width / 2 -
+              this.fieldWidth / 2 +
+              100 * (card.index-5) +
+              50 +
+              10 * (card.index-5) +
+              10,
+            this.sys.canvas.height * 0.75
+          );
+        }
         this.add.existing(card);
       });
 
@@ -121,19 +134,35 @@ export class PlayChildScene extends Phaser.Scene {
   }
 
   #reset(pointer) {
+    this.selected_cards.forEach((card) => {
+      card.selected = false;
+    });
     this.unselected_cards.push(...this.selected_cards);
     this.selected_cards = [];
     this.unselected_cards.forEach((card, i) => {
+      if (i<5){
       card.setPosition(
         this.sys.canvas.width / 2 -
           this.fieldWidth / 2 +
-          100 * card.index +
+          100 * i +
           50 +
-          10 * card.index +
+          10 * i +
           10,
-        this.sys.canvas.height * 0.7
+        this.sys.canvas.height * 0.65
       );
-    });
+    }
+    else{
+      card.setPosition(
+        this.sys.canvas.width / 2 -
+          this.fieldWidth / 2 +
+          100 * (i-5) +
+          50 +
+          10 * (i-5) +
+          10,
+        this.sys.canvas.height * 0.75
+      );
+    }
+  });
   }
 
   #clear() {
