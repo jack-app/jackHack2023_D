@@ -42,12 +42,12 @@ export class PlayScene extends Phaser.Scene {
     this.background.setSize(sys_width, sys_height);
 
     const product_name = this.add
-      .text(sys_width/2, 200, "Love game")
-      .setColor("#000000")
-      .setFontSize(80)
-      .setFontFamily("Helvetica")
-      .setOrigin(0.5)
-      .setInteractive();
+    .text(400, 200, "Romantext")
+    .setColor("#000000")
+    .setFontSize(80)
+    .setFontFamily("Helvetica")
+    .setOrigin(0.5)
+    .setInteractive();
 
     const start_game = this.add
       .text(sys_width/2-20, sys_height/2+100, "Game Start")
