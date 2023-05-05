@@ -101,7 +101,7 @@ export class PlayChildScene extends Phaser.Scene {
 
       this.reset = this.add
         .text(
-          this.sys.canvas.width / 2 - 30,
+          this.sys.canvas.width / 2 - 100,
           this.sys.canvas.height / 2,
           "reset"
         )
@@ -113,7 +113,7 @@ export class PlayChildScene extends Phaser.Scene {
 
       this.submit = this.add
         .text(
-          this.sys.canvas.width / 2 + 30,
+          this.sys.canvas.width / 2 + 100,
           this.sys.canvas.height / 2,
           "submit"
         )
