@@ -72,7 +72,7 @@ export class ResultScene extends Phaser.Scene {
 
     const change = this.add
       .text(600, 500, "return")
-      .setFontSize(20)
+      .setFontSize(35)
       .setOrigin(0.5)
       .setInteractive()
       .setColor("#000000")
