@@ -33,13 +33,14 @@ export class ResultScene extends Phaser.Scene {
       this.win_str = data.win; // string
       this.lose_str = data.lose; // array<string>
 
-      this.add.text(320, 100, "result",{
-          fontSize: 50})
+      this.add.text(250, 100, "【result】",{
+          fontSize: 50,
+          })
 
       this.add
         .text(150, 170, this.win_str, {
           fontSize: 50,
-          fontFamily: "Arial",
+          fontFamily: "游明朝",
           origin: 0.5,
         })
         .setInteractive();
@@ -47,7 +48,7 @@ export class ResultScene extends Phaser.Scene {
         this.add
           .text(150, 270+ i * 40, d, {
             fontSize: 30,
-            fontFamily: "Arial",
+            fontFamily: "游明朝",
             origin: 0.5,
           })
           .setInteractive();
