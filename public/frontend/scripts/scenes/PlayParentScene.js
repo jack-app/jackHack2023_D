@@ -58,6 +58,7 @@ export class PlayParentScene extends Phaser.Scene {
     this.background.setSize(this.sys.canvas.width, this.sys.canvas.height);
     let wait_sentence = this.add
       .text(400, 100, "プロポーズを待っています...")
+      .setColor("#000000")
       .setFontSize(30)
       .setFontFamily("Arial")
       .setOrigin(0.5)
@@ -70,6 +71,7 @@ export class PlayParentScene extends Phaser.Scene {
       wait_sentence.destroy();
       let judge_sentence = this.add
         .text(400, 100, "どのプロポーズを選びますか？")
+        .setColor("#000000")
         .setFontSize(30)
         .setFontFamily("Arial")
         .setOrigin(0.5)

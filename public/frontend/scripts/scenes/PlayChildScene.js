@@ -103,8 +103,9 @@ export class PlayChildScene extends Phaser.Scene {
         .text(
           this.sys.canvas.width / 2 - 100,
           this.sys.canvas.height / 2,
-          "reset"
+          "リセット"
         )
+        .setColor("#000000")
         .setFontSize(20)
         .setFontFamily("Arial")
         .setOrigin(0.5, 0.5)
@@ -115,8 +116,9 @@ export class PlayChildScene extends Phaser.Scene {
         .text(
           this.sys.canvas.width / 2 + 100,
           this.sys.canvas.height / 2,
-          "submit"
+          "プロポーズ"
         )
+        .setColor("#000000")
         .setFontSize(20)
         .setFontFamily("Arial")
         .setOrigin(0.5, 0.5)
@@ -182,7 +184,8 @@ export class PlayChildScene extends Phaser.Scene {
     socket.emit("submit", { sentence: str });
     this.#clear();
     let wait_sentence = this.add
-      .text(400, 100, "他の人の行動を待っています...")
+      .text(400, 150, "他の人の行動を待っています...")
+      .setColor("#000000")
       .setFontSize(30)
       .setFontFamily("Arial")
       .setOrigin(0.5)
